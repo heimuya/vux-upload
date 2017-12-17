@@ -1,0 +1,9 @@
+{
+  "name": "vux-upload",
+  "version": "0.1.0",
+  "description": "vux上传组件",
+  "main": "index.js",
+  "repository": "https://github.com/heimuya/vux-upload.git",
+  "author": "heiserenzhe",
+  "license": "MIT"
+}
