@@ -28,10 +28,10 @@ export default {
   data () {
     return {
       headers: {
-        token: '5b2944cfe9226e62589bc80c4afbb1f7'
+        token: '5b2944cqeqwe9226e62589bc80c4afbb1f7'
       },
       data: {
-        id: 62
+        id: 1
       },
       images: []
     }
