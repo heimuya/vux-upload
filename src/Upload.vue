@@ -174,7 +174,6 @@ export default {
     },
     onPreview (index) {
       if (this.preview) {
-        console.log(index)
         this.$refs.previewer.show(index);
       }
     },

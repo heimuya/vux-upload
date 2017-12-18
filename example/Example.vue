@@ -6,7 +6,7 @@
       :data="data"
       :images="images"
       :readonly="false"
-      :max="6"
+      :max="2"
       :withCredentials="false"
       :span="4"
       :preview="true"
@@ -38,11 +38,9 @@ export default {
   },
   methods: {
     onSuccess (res, file) {
-      console.log(this.images)
       this.images.push({
         src: 'http://jy.pietian.com' + res.result.path
       })
-      console.log(this.images)
     },
     onError (e) {
       console.log(e.message)
