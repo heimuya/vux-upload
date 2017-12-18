@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <vux-upload
-      url="http://jy.pietian.com/patient/record"
+      url="http://jy.pietian.com/patient/pic_upload"
       :headers="headers"
       :data="data"
       :images="images"
@@ -10,6 +10,9 @@
       :withCredentials="false"
       :span="4"
       :preview="true"
+      @success="onSuccess"
+      @error="onError"
+      @remove="onRemove"
     >
     </vux-upload>
   </div>
@@ -31,6 +34,20 @@ export default {
         id: 62
       },
       images: []
+    }
+  },
+  methods: {
+    onSuccess (res, file) {
+      this.images.push({
+        src: 'http://jy.pietian.com' + res.result.path
+      })
+      console.log(this.images)
+    },
+    onError (e) {
+      console.log(e.message)
+    },
+    onRemove (index) {
+      this.images.splice(index, 1)
     }
   }
 }

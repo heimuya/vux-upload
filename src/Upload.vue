@@ -94,41 +94,12 @@ export default {
       type: String,
       default: 'file'
     },
-    compress: Object,
-    onSuccess: {
-      type: Function,
-      default: () => {
-        return (res, file) => {
-          this.images.push({
-            src: res.data.url
-          })
-        }
-      }
-    },
-    onError: {
-      type: Function,
-      default: () => {
-        return (e, file) => {
-          console.log(e.message)
-        }
-      }
-    },
-    onRemove: {
-      type: Function,
-      default: () => {
-        return (index) => {
-          this.images.splice(index, 1)
-        }
-      }
-    }
+    compress: Object
   },
   data () {
     return {
       loading: false
     }
-  },
-  computed: {
-    
   },
   watch: {
     loading: function (newValue) {
@@ -185,8 +156,8 @@ export default {
           headers: this.headers,
           withCredentials: this.withCredentials
         }).then((response) => {
-          if (response.status === 200 && response.data.status === 'ok') {
-            this.onSuccess(res.data, file)
+          if (response.status === 200 && response.data.status.code === 0) {
+            this.onSuccess(response.data, file)
             this.loading = false
           } else {
             this.onError(new Error(response.data.message), file)
@@ -207,6 +178,15 @@ export default {
       if (this.preview) {
         this.$refs.previewer.show(this.images[index]);
       }
+    },
+    onSuccess (res, file) {
+      this.$emit('success', res, file)
+    },
+    onError (e) {
+      this.$emit('error', e)
+    },
+    onRemove (index) {
+      this.$emit('remove', index)
     }
   }
 }
