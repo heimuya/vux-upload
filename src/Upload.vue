@@ -74,7 +74,7 @@ export default {
     },
     span: {
       type: Number,
-      default: 3
+      default: 4
     },
     accept: {
       type: String,
@@ -87,10 +87,6 @@ export default {
     preview: {
       type: Boolean,
       default: true
-    },
-    fieldName: {
-      type: String,
-      default: 'file'
     },
     compress: Object
   },
@@ -142,7 +138,7 @@ export default {
       // 压缩上传
       lrz(file, Object.assign({
         quality: 0.7,
-        fieldName: this.fieldName
+        fieldName: 'file'
       }, this.compress)).then((rst) => {
         const data = rst.formData;
         for (let key in this.data) {
@@ -154,7 +150,7 @@ export default {
           headers: this.headers,
           withCredentials: this.withCredentials
         }).then((response) => {
-          if (response.status === 200 && response.data.status.code === 0) {
+          if (response.status === 200 && response.data.status === 'ok') {
             this.onSuccess(response.data, file)
             this.loading = false
           } else {
