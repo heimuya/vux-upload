@@ -38,6 +38,7 @@ export default {
   },
   methods: {
     onSuccess (res, file) {
+      console.log(this.images)
       this.images.push({
         src: 'http://jy.pietian.com' + res.result.path
       })

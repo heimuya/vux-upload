@@ -3,19 +3,17 @@
     <flexbox :gutter="0" wrap="wrap">
       <flexbox-item :span="span" v-for="(item, index) in images" :key="index" @click.native="onPreview(index)">
         <div class="vux-upload-bg">
-          <div class="vux-upload-content" :style="{ backgroudImage: `url(${item.src})` }">
-            <x-icon v-if="!readonly" type="ios-close" class="red" @click.native="onRemove(index)"></x-icon>
+          <div class="vux-upload-content" :style="{ backgroundImage: `url(${item.src})` }">
+            <x-icon v-if="!readonly" type="ios-close" class="red" @click.native="onRemove(index, $event)"></x-icon>
           </div>
         </div>
         
       </flexbox-item>
       <flexbox-item :span="span" v-show="!readonly && images.length < max">
         <div class="vux-upload-bg">
-          <div class="weui-uploader__input-box vux-upload-content">
+          <div class="weui-uploader__input-box vux-upload-content" :class="{ loading: loading }">
             <input v-show="!loading" ref="file" class="weui-uploader__input" value="" type="file" :accept="accept" :capture="capture" @change="onChange">
-            <div v-show="loading">
-              <inline-loading></inline-loading>
-            </div>
+            <inline-loading v-show="loading"></inline-loading>
           </div>
         </div>
       </flexbox-item>
@@ -176,16 +174,18 @@ export default {
     },
     onPreview (index) {
       if (this.preview) {
-        this.$refs.previewer.show(this.images[index]);
+        console.log(index)
+        this.$refs.previewer.show(index);
       }
     },
     onSuccess (res, file) {
       this.$emit('success', res, file)
     },
-    onError (e) {
-      this.$emit('error', e)
+    onError (e, file) {
+      this.$emit('error', e, file)
     },
-    onRemove (index) {
+    onRemove (index, e) {
+      e.stopPropagation()
       this.$emit('remove', index)
     }
   }
@@ -202,6 +202,19 @@ export default {
     margin-top: 7px;
     margin-bottom: 7px;
     .vux-upload-bg {
+      .loading:before, .loading:after {
+        width: 0;
+        height: 0;
+      }
+      .weui-loading {
+        width: 30px;
+        height: 30px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -15px;
+        margin-left: -15px;
+      }
       width: 80%;
       margin-left: 10%;
       .vux-x-icon {
