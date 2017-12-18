@@ -2,15 +2,20 @@
   <div class="vux-upload">
     <flexbox :gutter="0" wrap="wrap">
       <flexbox-item :span="span" v-for="(item, index) in images" :key="index" @click.native="onPreview(index)">
-        <div :style="{ backgroudImage: `url(${item.url})`, backgroundSize: 'cover', position: 'relative' }">
-          <x-icon type="ios-close" class="red"></x-icon>
+        <div class="vux-upload-bg">
+          <div class="vux-upload-content" :style="{ backgroudImage: `url(${item.src})` }">
+            <x-icon type="ios-close" class="red" @click.native="onRemove(index)"></x-icon>
+          </div>
         </div>
+        
       </flexbox-item>
-      <flexbox-item :span="span" v-show="!readonly && images.length < max" @click="addImage">
+      <flexbox-item :span="span" v-show="!readonly && images.length < max">
         <div class="vux-upload-bg">
           <div class="weui-uploader__input-box vux-upload-content">
-            <input ref="input" class="weui-uploader__input" type="file" :accept="accept" :capture="capture" @change="onChange">
-            <x-icon type="ios-close" class="red"></x-icon>
+            <input v-show="!loading" ref="file" class="weui-uploader__input" value="" type="file" :accept="accept" :capture="capture" @change="onChange">
+            <div v-show="loading">
+              <inline-loading></inline-loading>
+            </div>
           </div>
         </div>
       </flexbox-item>
@@ -48,10 +53,7 @@ export default {
       type: Number,
       default: 9
     },
-    title: {
-      type: String,
-      default: '图片上传'
-    },
+    beforeUpload: Function,
     withCredentials: {
       type: Boolean,
       default: false
@@ -83,25 +85,128 @@ export default {
     capture: {
       type: String,
       default: '*'
+    },
+    preview: {
+      type: Boolean,
+      default: true
+    },
+    fieldName: {
+      type: String,
+      default: 'file'
+    },
+    compress: Object,
+    onSuccess: {
+      type: Function,
+      default: () => {
+        return (res, file) => {
+          this.images.push({
+            src: res.data.url
+          })
+        }
+      }
+    },
+    onError: {
+      type: Function,
+      default: () => {
+        return (e, file) => {
+          console.log(e.message)
+        }
+      }
+    },
+    onRemove: {
+      type: Function,
+      default: () => {
+        return (index) => {
+          this.images.splice(index, 1)
+        }
+      }
+    }
+  },
+  data () {
+    return {
+      loading: false
     }
   },
   computed: {
-    iconStyle () {
-      return {
-        width: `${width / 5}px`,
-        height: `${width / 5}px`,
+    
+  },
+  watch: {
+    loading: function (newValue) {
+      if (!newValue) {
+        this.$refs['file'].value = ''
       }
     }
   },
   methods: {
-    addImage () {
+    onChange (event) {
+      // 移动端仅支持单文件上传
+      const file = event.target.files[0]
+      if (!file) return
 
+      this.uploadFile(file)
     },
-    onChange () {
+    uploadFile (file) {
+      if (this.images.length >= this.max) {
+        return
+      }
+      if (this.beforeUpload && typeof this.beforeUpload === 'function') {
+        const before = this.beforeUpload(file)
+        if (before && before.then) {
+          before.then(processedFile => {
+            const fileType = Object.prototype.toString.call(processedFile)
+            if (fileType === '[object File]' || fileType === '[object Blob]') {
+              this.post(processedFile);
+            } else {
+              this.post(file)
+            }
+          })
+        } else if (before !== false) {
+          this.post(file)
+        }
+      } else {
+        this.post(file)
+      }
+    },
+    post (file) {
+      this.loading = true
 
+      // 压缩上传
+      lrz(file, Object.assign({
+        quality: 0.7,
+        fieldName: this.fieldName
+      }, this.compress)).then((rst) => {
+        const data = rst.formData;
+        for (let key in this.data) {
+          if (this.data.hasOwnProperty(key)) {
+            data.append(key, this.data[key])
+          }
+        }
+        axios.post(this.url, data, {
+          headers: this.headers,
+          withCredentials: this.withCredentials
+        }).then((response) => {
+          if (response.status === 200 && response.data.status === 'ok') {
+            this.onSuccess(res.data, file)
+            this.loading = false
+          } else {
+            this.onError(new Error(response.data.message), file)
+            this.loading = false
+          }
+        }).catch((err) => {
+          this.onError(err, file)
+          this.loading = false
+        })
+      }).catch((err) => {
+        this.onError(err, file)
+      })
+    },
+    onProgress (e) {
+      this.loading = true
     },
     onPreview (index) {
-      this.$refs.previewer.show(index);
+      if (this.preview) {
+        this.$refs.previewer.show(this.images[index]);
+      }
     }
   }
 }
@@ -133,6 +238,8 @@ export default {
         height: 0;
         padding-bottom: 100%;
         margin: 0;
+        background-size: cover;
+        position: relative;
       }
     }
   }

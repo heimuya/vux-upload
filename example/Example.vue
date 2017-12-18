@@ -1,6 +1,17 @@
 <template>
   <div class="content">
-    <vux-upload url=""></vux-upload>
+    <vux-upload
+      url="http://jy.pietian.com/patient/record"
+      :headers="headers"
+      :data="data"
+      :images="images"
+      :readonly="false"
+      :max="6"
+      :withCredentials="false"
+      :span="4"
+      :preview="true"
+    >
+    </vux-upload>
   </div>
 </template>
 
@@ -14,8 +25,12 @@ export default {
   data () {
     return {
       headers: {
-        token: 'f89cc0f9200dcb862863dc0556bbb9ca'
-      }
+        token: '5b2944cfe9226e62589bc80c4afbb1f7'
+      },
+      data: {
+        id: 62
+      },
+      images: []
     }
   }
 }
