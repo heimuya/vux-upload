@@ -60,6 +60,14 @@ export default {
 
 详细使用方法可参考example中的示例。
 
+**注意** 接口返回参数中需要status字段,'ok'代表上传成功。
+
+```json
+{
+  status: 'ok'
+}
+```
+
 ### props说明
 
 * images
