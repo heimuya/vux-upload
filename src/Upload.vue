@@ -194,8 +194,8 @@ export default {
   overflow: initial;
   width: 100%;
   .vux-flexbox-item {
-    margin-top: 7px;
-    margin-bottom: 7px;
+    padding-top: 7px;
+    padding-bottom: 7px;
     .vux-upload-bg {
       .loading:before, .loading:after {
         width: 0;
