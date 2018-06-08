@@ -82,7 +82,7 @@ export default {
     },
     capture: {
       type: String,
-      default: '*'
+      default: ''
     },
     preview: {
       type: Boolean,
